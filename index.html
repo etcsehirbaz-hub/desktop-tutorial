@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bölgələrin Marafonu - MULTI ANİMASİYA SİSTEMİ</title>
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --finish-glow: #facc15;
+            --border-neon: rgba(56, 189, 248, 0.2);
+            --neon-gold: #facc15;
+            --neon-gold-glow: rgba(250, 204, 21, 0.4);
+            --coin-gold: #ffd700;
+        }
+
+        .color-0 { --name-color: #ef4444; --name-glow: rgba(239, 68, 68, 0.5); } 
+        .color-1 { --name-color: #3b82f6; --name-glow: rgba(59, 130, 246, 0.5); } 
+        .color-2 { --name-color: #10b981; --name-glow: rgba(16, 185, 129, 0.5); } 
+        .color-3 { --name-color: #a855f7; --name-glow: rgba(168, 85, 247, 0.5); } 
+        .color-4 { --name-color: #f97316; --name-glow: rgba(249, 115, 22, 0.5); } 
+        .color-5 { --name-color: #06b6d4; --name-glow: rgba(6, 182, 212, 0.5); } 
+        .color-6 { --name-color: #ec4899; --name-glow: rgba(236, 72, 153, 0.5); } 
+
+        body { 
+            background-color: var(--bg-dark); color: #ffffff; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0; overflow: hidden; height: 100vh;
+            display: flex; justify-content: center; 
+            background-image: linear-gradient(rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.85)), url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=1200'); 
+            background-size: cover; background-position: center;
+        }
+
+        .app-wrapper {
+            width: 100%; max-width: 650px; height: 100vh;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px);
+            border-left: 2px solid var(--border-neon); border-right: 2px solid var(--border-neon);
+            box-shadow: 0 0 60px rgba(0,0,0,0.9); display: flex; flex-direction: column; position: relative;
+        }
+
+        .header-area { 
+            display: flex; flex-direction: column; align-items: center; padding: 10px; 
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0) 100%);
+            border-bottom: 2px solid var(--neon-gold); flex-shrink: 0; text-align: center;
+        }
+
+        h1 { 
+            margin: 0 0 3px 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900;
+            animation: rgb-text-change 6s infinite linear, neon-flash 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes rgb-text-change {
+            0%, 100% { color: #3b82f6; }   
+            33% { color: #ef4444; }        
+            66% { color: #10b981; }        
+        }
+
+        @keyframes neon-flash {
+            0% { text-shadow: 0 0 4px currentColor, 0 0 10px currentColor; opacity: 0.85; }
+            100% { text-shadow: 0 0 12px currentColor, 0 0 25px currentColor; opacity: 1; transform: scale(1.02); }
+        }
+
+        #timer { 
+            font-size: 28px; font-weight: 900; color: var(--finish-glow); font-family: 'Courier New', monospace;
+            text-shadow: 0 0 15px rgba(250, 204, 21, 0.7); background: rgba(0,0,0,0.4);
+            padding: 2px 15px; border-radius: 20px; border: 1px solid rgba(250, 204, 21, 0.2); margin-top: 3px;
+        }
+
+        #game-container {
+            padding: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            box-sizing: border-box;
+            flex-grow: 1; 
+            height: calc(100vh - 100px);
+            overflow: hidden; 
+        }
+
+        .track { 
+            position: relative; 
+            flex: 1;
+            max-height: 110px;
+            min-height: 75px;
+            display: flex; 
+            align-items: center; 
+            background: #5c4033; 
+            border: 2px solid var(--neon-gold); 
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6), 0 0 10px var(--neon-gold-glow); 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            width: 100%; 
+            overflow: hidden;
+        }
+
+        .track-line {
+            position: absolute; left: 245px; right: 20px; height: 1px;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.3); z-index: 1;
+        }
+
+        .region-name { 
+            position: absolute; left: 15px; width: 100px; font-weight: 900; font-size: 25px; 
+            color: var(--name-color); text-shadow: 0 0 10px var(--name-glow), 2px 2px 4px rgba(0,0,0,0.9);
+            z-index: 20; white-space: nowrap; overflow: hidden; text-transform: uppercase;
+        }
+
+        .single-gift-container {
+            position: absolute; left: 125px; 
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(0, 0, 0, 0.8); padding: 4px 10px;
+            border-radius: 8px; border: 1.5px solid var(--neon-gold);
+            z-index: 25; min-width: 95px; height: 50px; box-shadow: 0 0 8px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+
+        .single-gift-container img {
+            width: 32px; height: 32px; object-fit: contain;
+            filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
+            animation: bounce-gift 1s infinite alternate ease-in-out;
+        }
+
+        @keyframes bounce-gift {
+            0% { transform: scale(0.92); }
+            100% { transform: scale(1.08); }
+        }
+
+        .gift-info-labels {
+            display: flex; flex-direction: column; justify-content: center; gap: 1px;
+        }
+
+        .gift-coin-label { font-size: 10px; font-weight: 900; color: var(--coin-gold); font-family: monospace; }
+        .gift-pts-label { font-size: 10px; font-weight: bold; color: #10b981; font-family: sans-serif; }
+
+        .horse-box { 
+            position: absolute; transition: left 0.6s cubic-bezier(0.25, 1, 0.5, 1); z-index: 30;
+            display: flex; align-items: center; justify-content: center; height: 100%;
+        }
+
+        .horse-box img {
+            height: 85%; max-height: 90px; width: auto; aspect-ratio: 1; object-fit: contain;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.6)); 
+            animation: gallop 0.4s infinite alternate ease-in-out;
+        }
+
+        @keyframes gallop {
+            0% { transform: translateY(-3px) rotate(-1deg); }
+            100% { transform: translateY(3px) rotate(2deg); }
+        }
+
+        .score { 
+            position: absolute; right: 15px; font-size: 13px; font-weight: bold; 
+            background: #0f172a; border: 1.5px solid var(--neon-gold);
+            box-shadow: 0 0 8px var(--neon-gold-glow); color: var(--neon-gold);
+            padding: 4px 8px; border-radius: 8px; z-index: 20; font-family: monospace;
+        }
+
+        #winner-screen { 
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(2, 6, 23, 0.95); justify-content: center; align-items: center; 
+            flex-direction: column; z-index: 999; backdrop-filter: blur(15px); 
+        }
+        #winner-box { 
+            text-align: center; background: #0f172a; padding: 35px; border-radius: 20px; 
+            border: 3px solid var(--finish-glow); box-shadow: 0 0 40px rgba(250, 204, 21, 0.4); width: 80%;
+        }
+        #winner-title { font-size: 32px; color: var(--finish-glow); margin-bottom: 5px; font-weight: 900; letter-spacing: 2px; }
+        #winner-name { font-size: 46px; font-weight: 900; text-transform: uppercase; color: #fff; margin: 15px 0; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .winner-avatar { width: 100px; height: 100px; object-fit: contain; }
+
+        #gift-alert-container {
+            position: absolute; 
+            top: 45%; 
+            left: 50%; 
+            transform: translate(-50%, -50%) scale(0);
+            width: 90%; 
+            max-width: 500px; 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 4px solid #facc15; 
+            box-shadow: 0 0 40px rgba(250, 204, 21, 0.8), inset 0 0 20px rgba(250, 204, 21, 0.4);
+            border-radius: 24px; 
+            padding: 15px 22px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            z-index: 99999; 
+            opacity: 0; 
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-sizing: border-box;
+        }
+        
+        #gift-alert-container.show { 
+            transform: translate(-50%, -50%) scale(1); 
+            opacity: 1; 
+        }
+        
+        .alert-user-pic { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            border: 3px solid #3b82f6; 
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); 
+        }
+        .alert-text-box { flex-grow: 1; }
+        .alert-user-name { font-size: 17px; font-weight: 900; color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); margin: 0; }
+        .alert-gift-desc { font-size: 13px; color: #f1f5f9; margin: 4px 0 0 0; font-weight: bold; line-height: 1.4; }
+        .alert-gift-desc b { color: #facc15; text-transform: uppercase; }
+        .alert-gift-img { width: 50px; height: 50px; object-fit: contain; animation: alert-gift-bounce 0.6s infinite alternate ease-in-out; }
+        @keyframes alert-gift-bounce { 0% { transform: scale(0.85) rotate(-8deg); } 100% { transform: scale(1.15) rotate(8deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <div class="header-area">
+            <h1>BÖLGƏLƏRİN MARAFONU 🐎</h1>
+            <div id="timer">00:00</div>
+        </div>
+        
+        <div id="game-container"></div>
+
+        <div id="winner-screen">
+            <div id="winner-box">
+                <div id="winner-title">🏆 QALİB 🏆</div>
+                <div id="winner-name">-</div>
+                <img src="horse.png" class="winner-avatar" alt="Winner">
+                <div style="font-size: 18px; color: #94a3b8; margin-top: 15px; font-weight: bold;">Möhtəşəm yarış idi!</div>
+            </div>
+        </div>
+
+        <div id="gift-alert-container">
+            <img src="" id="alert-pic" class="alert-user-pic" alt="User">
+            <div class="alert-text-box">
+                <p id="alert-user" class="alert-user-name">İstifadəçi</p>
+                <p id="alert-desc" class="alert-gift-desc">-</p>
+            </div>
+            <img src="" id="alert-gift-icon" class="alert-gift-img" alt="Gift">
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const container = document.getElementById('game-container');
+        const timerEl = document.getElementById('timer');
+        const winnerScreen = document.getElementById('winner-screen');
+        const winnerNameEl = document.getElementById('winner-name');
+        
+        let localRegions = {}; 
+        
+        // 🚨 EKRAVİDƏ DUBLİKAT SÜZGƏC YADDAŞI
+        let lastVisualScores = "";
+
+        function formatTime(seconds) {
+            let mins = Math.floor(seconds / 60);
+            let secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateHorsePositions() {
+            let maxScore = 0;
+            for (let key in localRegions) {
+                if (localRegions[key].score > maxScore) maxScore = localRegions[key].score;
+            }
+
+            for (let key in localRegions) {
+                let horseEl = document.getElementById(`horse-${key}`);
+                let scoreEl = document.getElementById(`score-${key}`);
+                
+                if (horseEl && scoreEl) {
+                    scoreEl.innerText = "Xal: " + localRegions[key].score;
+                    
+                    let startPercent = 44;  
+                    let centerPercent = 68; 
+                    let finalLeft = startPercent;
+
+                    if (maxScore > 0) {
+                        let ratio = localRegions[key].score / maxScore;
+                        finalLeft = startPercent + (ratio * (centerPercent - startPercent));
+                    }
+                    horseEl.style.left = finalLeft + '%';
+                }
+            }
+        }
+
+        socket.on('init-regions', (data) => {
+            container.innerHTML = '';
+            winnerScreen.style.display = 'none';
+            timerEl.innerText = formatTime(data.timeLeft);
+            localRegions = data.regions;
+            
+            let index = 0;
+            for (let key in data.regions) {
+                let colorClass = `color-${index % 7}`;
+                let reg = data.regions[key];
+                let gift = reg.gift; 
+                
+                container.innerHTML += `
+                    <div class="track" id="track-${key}">
+                        <div class="region-name ${colorClass}">${reg.name}</div>
+                        
+                        <div class="single-gift-container">
+                            <img src="${gift.img}" alt="${gift.displayName}">
+                            <div class="gift-info-labels">
+                                <span class="gift-coin-label">🪙 ${gift.value} Jet.</span>
+                                <span class="gift-pts-label">+${gift.pts} Xal</span>
+                            </div>
+                        </div>
+
+                        <div class="track-line"></div>
+                        <div class="horse-box" id="horse-${key}" style="left: 44%">
+                            <img src="horse.gif">
+                        </div>
+                        <div class="score" id="score-${key}">Xal: ${reg.score}</div>
+                    </div>
+                `;
+                index++;
+            }
+            updateHorsePositions();
+        });
+
+        socket.on('timer-update', (timeLeft) => {
+            timerEl.innerText = formatTime(timeLeft);
+        });
+
+        // 🔥 DÜZƏLDİLMİŞ HİSSƏ: DUBLİKAT XAL BLOKLAYICISI
+        socket.on('update-game', (data) => {
+            if (!data || !data.regions) return;
+
+            // Cari xalların unikal kombinasiya mətnini yığırıq
+            let currentScoreCheck = "";
+            for (let key in data.regions) {
+                currentScoreCheck += `${key}:${data.regions[key].score}|`;
+            }
+
+            // Əgər gələn xal məlumatı sonuncu ilə eynidirsə, animasiyanı təkrar oynatmasın!
+            if (lastVisualScores === currentScoreCheck) {
+                return; 
+            }
+            // Son vəziyyəti yadda saxla
+            lastVisualScores = currentScoreCheck;
+
+            localRegions = data.regions;
+            updateHorsePositions();
+        });
+
+        socket.on('game-over', (winner) => {
+            if(winner) {
+                winnerNameEl.innerText = winner.name;
+                winnerScreen.style.display = 'flex';
+            }
+        });
+
+        const giftAlertBox = document.getElementById('gift-alert-container');
+        const alertPic = document.getElementById('alert-pic');
+        const alertUser = document.getElementById('alert-user');
+        const alertDesc = document.getElementById('alert-desc');
+        const alertGiftIcon = document.getElementById('alert-gift-icon');
+
+        let alertQueue = []; 
+        let isAlertPlaying = false;
+
+        socket.on('gift-alert', (data) => {
+            alertQueue.push(data);
+            if (!isAlertPlaying) { playNextAlert(); }
+        });
+
+        function playNextAlert() {
+            if (alertQueue.length === 0) { isAlertPlaying = false; return; }
+            isAlertPlaying = true;
+            const currentAlert = alertQueue.shift();
+
+            alertPic.src = currentAlert.profilePic || 'https://www.tiktok.com/favicon.ico';
+            alertUser.innerText = currentAlert.nickname || currentAlert.username;
+            alertDesc.innerHTML = `<b>${currentAlert.regionName}</b> üçün <b>${currentAlert.giftName}</b> (x${currentAlert.count}) atdı!`;
+            alertGiftIcon.src = currentAlert.giftImg;
+
+            giftAlertBox.classList.add('show');
+
+            setTimeout(() => {
+                giftAlertBox.classList.remove('show');
+                setTimeout(() => { playNextAlert(); }, 600);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
